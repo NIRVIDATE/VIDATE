@@ -1,5 +1,5 @@
 {
-  "name": "vidate",
+  "name": "vidate-mock",
   "version": "1.0.0",
   "scripts": {
     "dev": "vite",
