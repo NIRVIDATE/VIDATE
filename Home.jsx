@@ -1,85 +1,69 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Heart, X, Trash2 } from 'lucide-react';
 
-export default function App() {
-  const [step, setStep] = useState(0);
+const mockVideoList = [
+  { id: 1, name: "נועה", age: 25, videoUrl: "https://www.w3schools.com/html/mov_bbb.mp4" },
+];
+
+export default function Home() {
+  const [step, setStep] = useState(1);
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
-  const [genderPref, setGenderPref] = useState('');
-  const [minAge, setMinAge] = useState('');
-  const [maxAge, setMaxAge] = useState('');
+  const [gender, setGender] = useState('');
   const [liked, setLiked] = useState([]);
-  const [current, setCurrent] = useState(0);
-
-  const mockVideos = [
-    { id: 1, name: 'דנה', age: 28, video: 'https://www.w3schools.com/html/mov_bbb.mp4' },
-    { id: 2, name: 'עדי', age: 31, video: 'https://www.w3schools.com/html/movie.mp4' }
-  ];
-
-  const handleLike = () => {
-    setLiked([...liked, mockVideos[current]]);
-    handleNext();
-  };
-
-  const handleNext = () => {
-    if (current + 1 < mockVideos.length) {
-      setCurrent(current + 1);
-    } else {
-      setStep(4);
-    }
-  };
-
-  const handleRemove = id => {
-    setLiked(liked.filter(p => p.id !== id));
-  };
+  const [currentVideo, setCurrentVideo] = useState(mockVideoList[0]);
 
   return (
-    <div style={{ fontFamily: 'sans-serif', direction: 'rtl', padding: 20 }}>
-      {step === 0 && (
-        <div>
-          <h1>ברוך הבא ל־VIDATE</h1>
-          <button onClick={() => setStep(1)}>התחל</button>
-        </div>
-      )}
-
+    <div className="p-6 font-sans min-h-screen bg-gradient-to-br from-white to-purple-100 text-right">
       {step === 1 && (
-        <div>
-          <h2>הרשמה</h2>
-          <input placeholder="שם" value={name} onChange={e => setName(e.target.value)} /><br />
-          <input placeholder="גיל" type="number" value={age} onChange={e => setAge(e.target.value)} /><br />
-          <p>מין מועדף:</p>
-          <button onClick={() => setGenderPref('נשים')}>נשים</button>
-          <button onClick={() => setGenderPref('גברים')}>גברים</button><br />
-          <input placeholder="גיל מינ'" value={minAge} onChange={e => setMinAge(e.target.value)} />
-          <input placeholder="גיל מקס'" value={maxAge} onChange={e => setMaxAge(e.target.value)} /><br />
-          <button onClick={() => setStep(2)}>המשך</button>
+        <div className="text-center space-y-6">
+          <h1 className="text-3xl font-bold text-purple-800">ברוך הבא ל־VIDATE</h1>
+          <button onClick={() => setStep(2)} className="bg-pink-400 text-white px-6 py-2 rounded-full shadow-md">
+            התחל
+          </button>
         </div>
       )}
-
       {step === 2 && (
-        <div>
-          <h2>העלה סרטון (דמו)</h2>
-          <input type="file" accept="video/*" /><br />
-          <button onClick={() => setStep(3)}>המשך</button>
+        <div className="max-w-md mx-auto space-y-4">
+          <h2 className="text-xl font-bold">צור חשבון</h2>
+          <input className="w-full border p-2 rounded" placeholder="שם" value={name} onChange={e => setName(e.target.value)} />
+          <input className="w-full border p-2 rounded" placeholder="גיל" value={age} onChange={e => setAge(e.target.value)} />
+          <select className="w-full border p-2 rounded" value={gender} onChange={e => setGender(e.target.value)}>
+            <option value="">העדפה מינית</option>
+            <option value="female">נשים</option>
+            <option value="male">גברים</option>
+          </select>
+          <button onClick={() => setStep(3)} className="bg-indigo-500 text-white px-6 py-2 rounded-full">המשך</button>
         </div>
       )}
-
-      {step === 3 && (
-        <div>
-          <h2>התאמה עבורך</h2>
-          <video width="300" controls src={mockVideos[current].video}></video>
-          <p>{mockVideos[current].name}, {mockVideos[current].age}</p>
-          <button onClick={handleLike}>אהבתי</button>
-          <button onClick={handleNext}>לא עכשיו</button>
+      {step === 3 && currentVideo && (
+        <div className="flex flex-col items-center gap-4">
+          <video width="250" controls className="rounded-lg shadow-lg">
+            <source src={currentVideo.videoUrl} type="video/mp4" />
+          </video>
+          <p className="text-lg">{currentVideo.name}, {currentVideo.age}</p>
+          <div className="flex gap-6 text-2xl">
+            <button onClick={() => {
+              setLiked([...liked, currentVideo]);
+              setCurrentVideo(null);
+              setStep(4);
+            }} className="text-pink-500"><Heart /></button>
+            <button onClick={() => {
+              setCurrentVideo(null);
+              setStep(4);
+            }} className="text-blue-500"><X /></button>
+          </div>
         </div>
       )}
-
       {step === 4 && (
-        <div>
-          <h2>התאמות שאהבת</h2>
-          {liked.map(p => (
-            <div key={p.id}>
-              <p>{p.name}, {p.age}</p>
-              <button onClick={() => handleRemove(p.id)}>מחק</button>
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold">אהבתי</h2>
+          {liked.map(person => (
+            <div key={person.id} className="flex justify-between items-center bg-white p-3 rounded shadow">
+              <span>{person.name}, {person.age}</span>
+              <button onClick={() => setLiked(liked.filter(p => p.id !== person.id))}>
+                <Trash2 className="text-gray-500" />
+              </button>
             </div>
           ))}
         </div>
